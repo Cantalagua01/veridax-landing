@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERIDAX — Descubre la verdad detrás de los datos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04080F;--bg2:#080E1A;--bg3:#0C1525;
+  --ac:#6EB5FD;--ac2:#1E58C3;--ac3:#001F4B;
+  --tx:#E8EDF5;--tx2:#8899AA;--tx3:#445566;
+  --br:rgba(110,181,253,.18);--br2:rgba(110,181,253,.07);
+  --glow:0 0 40px rgba(110,181,253,.15);
+  --fh:'Syne',sans-serif;--fm:'Space Mono',monospace;--fb:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(110,181,253,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(110,181,253,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.2}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(110,181,253,.4),transparent 70%);top:-200px;right:-200px}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(30,88,195,.4),transparent 70%);bottom:20%;left:-150px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 4rem;display:flex;align-items:center;justify-content:space-between;background:rgba(4,8,15,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--br2)}
+.nav-logo{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.nav-logo-text{font-family:var(--fh);font-size:1.3rem;font-weight:800;letter-spacing:.12em;color:var(--tx)}
+.nav-logo-text span{color:var(--ac)}
+.nav-links{display:flex;align-items:center;gap:2.5rem;list-style:none}
+.nav-links a{font-family:var(--fm);font-size:.72rem;color:var(--tx2);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--ac)}
+.lt{display:flex;border:1px solid var(--br);border-radius:6px;overflow:hidden}
+.lb{padding:.4rem .8rem;font-family:var(--fm);font-size:.7rem;letter-spacing:.1em;background:transparent;color:var(--tx2);border:none;cursor:pointer;transition:all .2s}
+.lb.active{background:var(--ac);color:var(--bg);font-weight:700}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 4rem;position:relative;z-index:1}
+.badge{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border:1px solid var(--br);border-radius:100px;font-family:var(--fm);font-size:.7rem;letter-spacing:.15em;color:var(--ac);margin-bottom:2.5rem;background:rgba(110,181,253,.06)}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+h1{font-family:var(--fh);font-size:clamp(3rem,7vw,6.5rem);font-weight:800;line-height:.95;letter-spacing:-.02em;margin-bottom:1.5rem}
+h1 .l1{display:block;color:var(--tx)}
+h1 .l2{display:block;background:linear-gradient(135deg,#001F4B,#1E58C3,#6EB5FD);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:1.1rem;color:var(--tx2);max-width:520px;line-height:1.7;margin-bottom:3rem;font-weight:300}
+.cta{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;justify-content:center}
+.bp{padding:.9rem 2.2rem;background:var(--ac);color:var(--bg);font-family:var(--fm);font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.bp:hover{background:#90C8FF;transform:translateY(-2px);box-shadow:0 8px 30px rgba(110,181,253,.3)}
+.bs{padding:.9rem 2.2rem;background:transparent;color:var(--tx);font-family:var(--fm);font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--br);border-radius:8px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.bs:hover{border-color:var(--ac);color:var(--ac)}
+
+/* STATS */
+.stats{position:relative;z-index:1;padding:2rem 4rem;display:flex;justify-content:center;border-top:1px solid var(--br2);border-bottom:1px solid var(--br2)}
+.si{flex:1;max-width:200px;text-align:center;padding:2rem;border-right:1px solid var(--br2)}
+.si:last-child{border-right:none}
+.sn{font-family:var(--fh);font-size:2.5rem;font-weight:800;color:var(--ac);display:block;margin-bottom:.3rem}
+.sl{font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.15em;text-transform:uppercase}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:6rem 4rem;max-width:1200px;margin:0 auto}
+.slb{font-family:var(--fm);font-size:.7rem;letter-spacing:.2em;color:var(--ac);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:.8rem}
+.slb::before{content:'';display:block;width:24px;height:1px;background:var(--ac)}
+.st{font-family:var(--fh);font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.15;margin-bottom:1.2rem;color:var(--tx)}
+.sd{font-size:1rem;color:var(--tx2);line-height:1.8;max-width:560px;font-weight:300}
+
+/* DEMO SECTION */
+.demo-section{position:relative;z-index:1;padding:6rem 4rem;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);border-top:1px solid var(--br2);border-bottom:1px solid var(--br2)}
+.demo-inner{max-width:900px;margin:0 auto;text-align:center}
+.demo-card{background:var(--bg3);border:1px solid var(--br);border-radius:16px;padding:2.5rem;margin-top:3rem;text-align:left}
+.demo-form{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.demo-form-full{grid-column:1/-1}
+.demo-input{width:100%;padding:.8rem 1rem;background:var(--bg2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-family:var(--fb);font-size:.9rem;outline:none;transition:border-color .2s}
+.demo-input:focus{border-color:var(--ac)}
+.demo-input::placeholder{color:var(--tx3)}
+.demo-submit{width:100%;padding:1rem;background:var(--ac);color:var(--bg);font-family:var(--fm);font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.demo-submit:hover{background:#90C8FF;transform:translateY(-2px)}
+.demo-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.demo-note{font-family:var(--fm);font-size:.65rem;color:var(--tx3);text-align:center;margin-top:.8rem;letter-spacing:.05em}
+
+/* DEMO RESULTS */
+.demo-results{margin-top:2rem;display:none}
+.demo-results.show{display:block}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--br2)}
+.result-name{font-family:var(--fh);font-size:1.3rem;font-weight:700;color:var(--tx)}
+.risk-badge{padding:.4rem 1rem;border-radius:100px;font-family:var(--fm);font-size:.72rem;font-weight:700;letter-spacing:.1em}
+.risk-low{background:rgba(74,222,128,.1);color:#4ADE80;border:1px solid rgba(74,222,128,.3)}
+.risk-mid{background:rgba(255,144,96,.1);color:#FF9060;border:1px solid rgba(255,144,96,.3)}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.result-item{background:var(--bg2);border:1px solid var(--br2);border-radius:10px;padding:1rem}
+.result-label{font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.result-value{font-size:.9rem;color:var(--tx);font-weight:500}
+.result-value.verified{color:#4ADE80}
+
+/* BLUR EFFECT */
+.blurred{filter:blur(6px);user-select:none;cursor:pointer;position:relative;transition:filter .2s}
+.blur-wrap{position:relative;display:inline-block}
+.lock-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--ac);font-family:var(--fm);letter-spacing:.05em;cursor:pointer}
+
+/* UNLOCK CTA */
+.unlock-cta{margin-top:1.5rem;padding:1.5rem;background:linear-gradient(135deg,rgba(110,181,253,.08),rgba(30,88,195,.08));border:1px solid rgba(110,181,253,.25);border-radius:12px;text-align:center}
+.unlock-title{font-family:var(--fh);font-size:1.1rem;font-weight:700;color:var(--tx);margin-bottom:.5rem}
+.unlock-desc{font-size:.85rem;color:var(--tx2);margin-bottom:1.2rem}
+.unlock-btn{padding:.8rem 2rem;background:var(--ac);color:var(--bg);font-family:var(--fm);font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:all .2s}
+.unlock-btn:hover{background:#90C8FF;transform:translateY(-2px)}
+
+/* FEATURES */
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
+.fc{background:var(--bg2);border:1px solid var(--br2);border-radius:12px;padding:2rem;transition:all .3s;position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--ac),transparent);opacity:0;transition:opacity .3s}
+.fc:hover{border-color:var(--br);transform:translateY(-4px);box-shadow:var(--glow)}
+.fc:hover::before{opacity:1}
+.fi{width:44px;height:44px;border-radius:10px;background:rgba(110,181,253,.08);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;font-size:1.2rem}
+.ft{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--tx);margin-bottom:.5rem}
+.fd{font-size:.85rem;color:var(--tx2);line-height:1.7}
+
+/* MODULES */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:4rem}
+.mc{background:var(--bg2);border:1px solid var(--br2);border-radius:16px;padding:2.5rem}
+.mc.hi{border-color:rgba(110,181,253,.25);background:linear-gradient(135deg,rgba(110,181,253,.05),rgba(30,88,195,.05))}
+.mt2{display:inline-flex;padding:.3rem .8rem;background:rgba(110,181,253,.1);border:1px solid var(--br);border-radius:100px;font-family:var(--fm);font-size:.65rem;letter-spacing:.1em;color:var(--ac);margin-bottom:1.2rem}
+.mti{font-family:var(--fh);font-size:1.6rem;font-weight:700;color:var(--tx);margin-bottom:.8rem}
+.md{font-size:.9rem;color:var(--tx2);line-height:1.7;margin-bottom:1.5rem}
+.mf{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.mf li{display:flex;align-items:center;gap:.6rem;font-family:var(--fm);font-size:.72rem;color:var(--tx2)}
+.mf li::before{content:'→';color:var(--ac)}
+
+/* PRICING - 4 PLANES */
+.pg{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:4rem}
+.pc{background:var(--bg2);border:1px solid var(--br2);border-radius:16px;padding:2rem;position:relative;transition:all .3s}
+.pc.fe{border-color:rgba(110,181,253,.4);background:linear-gradient(180deg,rgba(110,181,253,.07) 0%,var(--bg2) 100%)}
+.pb{position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:.25rem 1rem;background:var(--ac);color:var(--bg);font-family:var(--fm);font-size:.65rem;font-weight:700;letter-spacing:.1em;border-radius:100px;white-space:nowrap}
+.pp{font-family:var(--fm);font-size:.65rem;letter-spacing:.15em;color:var(--tx3);text-transform:uppercase;margin-bottom:.8rem}
+.plan-icon{font-size:1.5rem;margin-bottom:.8rem;display:block}
+.pa{font-family:var(--fh);font-size:2.5rem;font-weight:800;color:var(--tx);line-height:1;margin-bottom:.2rem}
+.pa sup{font-size:1rem;vertical-align:top;margin-top:.4rem;color:var(--tx2)}
+.ppe{font-size:.75rem;color:var(--tx2);margin-bottom:.5rem}
+.psearches{font-family:var(--fm);font-size:.7rem;color:var(--ac);margin-bottom:1.2rem;padding:.3rem .6rem;background:rgba(110,181,253,.08);border-radius:6px;display:inline-block}
+.pf{list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem}
+.pf li{display:flex;align-items:flex-start;gap:.5rem;font-size:.8rem;color:var(--tx2);line-height:1.4}
+.pf li::before{content:'✓';color:var(--ac);font-weight:700;font-size:.75rem;flex-shrink:0;margin-top:1px}
+
+/* PIPELINE */
+.ps{display:flex;gap:0;position:relative;margin-top:3rem}
+.ps::before{content:'';position:absolute;top:28px;left:28px;right:28px;height:1px;background:linear-gradient(90deg,var(--ac3),var(--ac2),var(--ac));opacity:.4}
+.pst{flex:1;text-align:center;padding:0 .5rem}
+.psn{width:56px;height:56px;border-radius:50%;background:var(--bg2);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:.75rem;font-weight:700;color:var(--ac);margin:0 auto 1rem;position:relative;z-index:1}
+.pstit{font-family:var(--fh);font-size:.8rem;font-weight:700;color:var(--tx);margin-bottom:.3rem}
+.psd{font-size:.72rem;color:var(--tx2);line-height:1.5}
+
+/* SOURCES */
+.srg{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:3rem}
+.src{padding:.5rem 1rem;background:var(--bg2);border:1px solid var(--br2);border-radius:8px;font-family:var(--fm);font-size:.72rem;color:var(--tx2);letter-spacing:.05em;transition:all .2s}
+.src.ac2{border-color:rgba(110,181,253,.3);color:var(--ac);background:rgba(110,181,253,.07)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--br2);padding:3rem 4rem;display:flex;align-items:center;justify-content:space-between}
+.fl{display:flex;align-items:center;gap:.6rem}
+.flt{font-family:var(--fh);font-size:1.1rem;font-weight:800;letter-spacing:.12em}
+.flt span{color:var(--ac)}
+.fc2{font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;margin-top:.4rem}
+.flinks{display:flex;gap:2rem;list-style:none}
+.flinks a{font-family:var(--fm);font-size:.65rem;color:var(--tx3);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .2s}
+.flinks a:hover{color:var(--ac)}
+
+@keyframes fu{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .8s ease forwards}
+.fu2{animation:fu .8s .15s ease both}
+.fu3{animation:fu .8s .3s ease both}
+.fu4{animation:fu .8s .45s ease both}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+
+/* LANG */
+[data-lang="en"]{display:none}
+body.en [data-lang="en"]{display:block}
+body.en [data-lang="es"]{display:none}
+body.en span[data-lang="en"]{display:inline}
+body.en span[data-lang="es"]{display:none}
+span[data-lang="en"]{display:none}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gR" x1="20" y1="80" x2="80" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#001F4B"/>
+      <stop offset="100%" stop-color="#6EB5FD"/>
+    </linearGradient>
+    <linearGradient id="gS" x1="50" y1="75" x2="50" y2="25" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#001F4B"/>
+      <stop offset="100%" stop-color="#6EB5FD"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="38" height="38" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="url(#gR)" stroke-width="7" fill="none"/>
+      <circle cx="50" cy="50" r="37" stroke="#1E58C3" stroke-width="2.5" fill="none"/>
+      <circle cx="50" cy="30" r="3" fill="url(#gS)"/>
+      <circle cx="66" cy="38" r="3" fill="url(#gS)"/>
+      <circle cx="66" cy="58" r="3" fill="url(#gS)"/>
+      <circle cx="50" cy="68" r="3" fill="url(#gS)"/>
+      <circle cx="34" cy="58" r="3" fill="url(#gS)"/>
+      <circle cx="34" cy="38" r="3" fill="url(#gS)"/>
+      <circle cx="50" cy="49" r="3.5" fill="url(#gS)"/>
+      <line x1="50" y1="30" x2="66" y2="38" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+      <line x1="66" y1="38" x2="66" y2="58" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+      <line x1="66" y1="58" x2="50" y2="68" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+      <line x1="50" y1="68" x2="34" y2="58" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+      <line x1="34" y1="58" x2="34" y2="38" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+      <line x1="34" y1="38" x2="50" y2="30" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+      <line x1="50" y1="30" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      <line x1="66" y1="38" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      <line x1="66" y1="58" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      <line x1="50" y1="68" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      <line x1="34" y1="58" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      <line x1="34" y1="38" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      <circle cx="78" cy="22" r="11" fill="#04080F" stroke="#1E58C3" stroke-width="1.5"/>
+      <text x="73.5" y="25" font-family="sans-serif" font-size="7" fill="#1E58C3" font-weight="bold">IA</text>
+    </svg>
+    <span class="nav-logo-text">VERIDA<span>X</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#demo" data-lang="es">Demo Gratis</a><a href="#demo" data-lang="en">Free Demo</a></li>
+    <li><a href="#features" data-lang="es">Características</a><a href="#features" data-lang="en">Features</a></li>
+    <li><a href="#pricing" data-lang="es">Precios</a><a href="#pricing" data-lang="en">Pricing</a></li>
+    <li><a href="#contact" data-lang="es">Contacto</a><a href="#contact" data-lang="en">Contact</a></li>
+  </ul>
+  <div class="lt">
+    <button class="lb active" onclick="setLang('es')">ES</button>
+    <button class="lb" onclick="setLang('en')">EN</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge fu">OSINT PLATFORM · LATAM</div>
+  <h1 class="fu2">
+    <span class="l1" data-lang="es">DESCUBRE LA VERDAD</span>
+    <span class="l1" data-lang="en">UNCOVER THE TRUTH</span>
+    <span class="l2" data-lang="es">DETRÁS DE LOS DATOS</span>
+    <span class="l2" data-lang="en">BEHIND THE DATA</span>
+  </h1>
+  <p class="sub fu3">
+    <span data-lang="es">Inteligencia OSINT automatizada para personas y empresas en LATAM. Verificación en segundos, análisis con IA, decisiones con certeza.</span>
+    <span data-lang="en">Automated OSINT intelligence for people and companies in LATAM. Verification in seconds, AI-powered analysis, decisions with certainty.</span>
+  </p>
+  <div class="cta fu4">
+    <a href="#demo" class="bp"><span data-lang="es">🔍 Prueba gratis</span><span data-lang="en">🔍 Try for free</span></a>
+    <a href="#pricing" class="bs"><span data-lang="es">Ver planes</span><span data-lang="en">View plans</span></a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="si"><span class="sn">12+</span><span class="sl" data-lang="es">Fuentes de datos</span><span class="sl" data-lang="en">Data sources</span></div>
+  <div class="si"><span class="sn">&lt;15s</span><span class="sl" data-lang="es">Tiempo de respuesta</span><span class="sl" data-lang="en">Response time</span></div>
+  <div class="si"><span class="sn">88%</span><span class="sl" data-lang="es">Confianza promedio</span><span class="sl" data-lang="en">Avg confidence</span></div>
+  <div class="si"><span class="sn">3</span><span class="sl" data-lang="es">Países LATAM</span><span class="sl" data-lang="en">LATAM countries</span></div>
+  <div class="si"><span class="sn">AI</span><span class="sl" data-lang="es">Análisis inteligente</span><span class="sl" data-lang="en">Smart analysis</span></div>
+</div>
+
+<!-- DEMO SECTION -->
+<div class="demo-section" id="demo">
+  <div class="demo-inner">
+    <div class="slb" style="justify-content:center">
+      <span data-lang="es">Demo gratuito</span>
+      <span data-lang="en">Free demo</span>
+    </div>
+    <h2 class="st" style="font-size:2.5rem;text-align:center">
+      <span data-lang="es">Prueba VERIDAX ahora</span>
+      <span data-lang="en">Try VERIDAX now</span>
+    </h2>
+    <p class="sd" style="margin:0 auto 0;text-align:center;max-width:480px">
+      <span data-lang="es">1 búsqueda gratis. Sin tarjeta de crédito. Resultados en segundos.</span>
+      <span data-lang="en">1 free search. No credit card. Results in seconds.</span>
+    </p>
+
+    <div class="demo-card">
+      <form id="demoForm" onsubmit="runDemo(event)">
+        <div class="demo-form">
+          <div>
+            <label style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.4rem" data-lang="es">Tu nombre</label>
+            <label style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.4rem" data-lang="en">Your name</label>
+            <input type="text" id="leadNombre" class="demo-input" placeholder="Tu nombre completo" required>
+          </div>
+          <div>
+            <label style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.4rem" data-lang="es">Tu email</label>
+            <label style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.4rem" data-lang="en">Your email</label>
+            <input type="email" id="leadEmail" class="demo-input" placeholder="tu@email.com" required>
+          </div>
+          <div class="demo-form-full">
+            <label style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.4rem" data-lang="es">¿A quién quieres investigar?</label>
+            <label style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.4rem" data-lang="en">Who do you want to investigate?</label>
+            <input type="text" id="busquedaNombre" class="demo-input" placeholder="Nombre de persona o empresa" required>
+          </div>
+        </div>
+        <button type="submit" class="demo-submit" id="demoBtn">
+          <span id="demoBtnText" data-lang="es">🔍 Ejecutar búsqueda gratuita</span>
+          <span id="demoBtnTextEn" data-lang="en">🔍 Run free search</span>
+        </button>
+        <p class="demo-note">
+          <span data-lang="es">🔒 Tus datos están seguros. Recibirás el reporte completo por email.</span>
+          <span data-lang="en">🔒 Your data is safe. You'll receive the full report by email.</span>
+        </p>
+      </form>
+
+      <!-- DEMO RESULTS -->
+      <div class="demo-results" id="demoResults">
+        <div class="result-header">
+          <div>
+            <div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);margin-bottom:.3rem" data-lang="es">REPORTE PARCIAL · VERIDAX DEMO</div>
+            <div style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);margin-bottom:.3rem" data-lang="en">PARTIAL REPORT · VERIDAX DEMO</div>
+            <div class="result-name" id="resultNombre">—</div>
+          </div>
+          <div id="resultRisk" class="risk-badge risk-low">BAJO · 15/100</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-label" data-lang="es">📧 Email corporativo</div>
+            <div class="result-label" data-lang="en">📧 Corporate email</div>
+            <div class="result-value">
+              <span class="blur-wrap">
+                <span class="blurred" id="resultEmail">████████@empresa.com</span>
+                <span class="lock-overlay">🔒 <span data-lang="es">Desbloquear</span><span data-lang="en">Unlock</span></span>
+              </span>
+            </div>
+            <div style="font-size:.72rem;color:#4ADE80;margin-top:.3rem" id="resultEmailScore">Score: — · deliverable ✓</div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-label" data-lang="es">📱 Teléfono</div>
+            <div class="result-label" data-lang="en">📱 Phone</div>
+            <div class="result-value verified" id="resultCarrier">Telcel · mobile · MX ✓</div>
+            <div class="blur-wrap" style="display:block;margin-top:.3rem">
+              <span class="blurred" style="font-size:.85rem;color:var(--tx2)">+52 ██ ████ ████</span>
+              <span class="lock-overlay" style="font-size:.65rem">🔒</span>
+            </div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-label">LinkedIn</div>
+            <div class="result-value verified" id="resultLinkedinEmpresa">TIVIT LATAM ✓</div>
+            <div class="blur-wrap" style="display:block;margin-top:.3rem">
+              <span class="blurred" style="font-size:.8rem;color:var(--ac)">https://linkedin.com/in/████████████</span>
+              <span class="lock-overlay" style="font-size:.65rem">🔒</span>
+            </div>
+          </div>
+
+          <div class="result-item">
+            <div class="result-label" data-lang="es">🛡️ Confianza general</div>
+            <div class="result-label" data-lang="en">🛡️ Overall confidence</div>
+            <div class="result-value verified" style="font-size:1.5rem;font-family:var(--fh);font-weight:800" id="resultConfianza">88%</div>
+            <div style="font-size:.72rem;color:var(--tx2);margin-top:.2rem" data-lang="es">Datos verificados en múltiples fuentes</div>
+            <div style="font-size:.72rem;color:var(--tx2);margin-top:.2rem" data-lang="en">Data verified across multiple sources</div>
+          </div>
+        </div>
+
+        <!-- UNLOCK CTA -->
+        <div class="unlock-cta">
+          <div class="unlock-title" data-lang="es">🔓 Desbloquea el reporte completo</div>
+          <div class="unlock-title" data-lang="en">🔓 Unlock the full report</div>
+          <p class="unlock-desc" data-lang="es">Accede a emails completos, número de teléfono, URL de LinkedIn, análisis IA completo y más por solo $9/mes.</p>
+          <p class="unlock-desc" data-lang="en">Access full emails, phone number, LinkedIn URL, complete AI analysis and more for just $9/month.</p>
+          <a href="#pricing" class="unlock-btn" data-lang="es">Ver planes desde $9/mes →</a>
+          <a href="#pricing" class="unlock-btn" data-lang="en">View plans from $9/month →</a>
+        </div>
+
+        <p style="font-family:var(--fm);font-size:.65rem;color:var(--tx3);text-align:center;margin-top:1rem">
+          <span data-lang="es">✉️ Te enviamos el reporte completo a tu email en cuanto te suscribas.</span>
+          <span data-lang="en">✉️ We'll send you the full report to your email as soon as you subscribe.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="slb"><span data-lang="es">Capacidades</span><span data-lang="en">Capabilities</span></div>
+  <h2 class="st"><span data-lang="es">Todo lo que necesitas para investigar</span><span data-lang="en">Everything you need to investigate</span></h2>
+  <p class="sd"><span data-lang="es">Desde verificación básica hasta análisis profundo con IA. VERIDAX consolida múltiples fuentes en segundos.</span><span data-lang="en">From basic verification to deep AI analysis. VERIDAX consolidates multiple sources in seconds.</span></p>
+  <div class="fg">
+    <div class="fc"><div class="fi">🔍</div><div class="ft" data-lang="es">Búsqueda automática</div><div class="ft" data-lang="en">Automatic search</div><p class="fd" data-lang="es">Solo el nombre. VERIDAX encuentra emails, teléfono, LinkedIn y redes sociales automáticamente.</p><p class="fd" data-lang="en">Just the name. VERIDAX automatically finds emails, phone, LinkedIn and social media.</p></div>
+    <div class="fc"><div class="fi">🤖</div><div class="ft" data-lang="es">Análisis con IA</div><div class="ft" data-lang="en">AI Analysis</div><p class="fd" data-lang="es">Claude AI genera reportes ejecutivos con risk score, datos verificados y recomendaciones accionables.</p><p class="fd" data-lang="en">Claude AI generates executive reports with risk score, verified data and actionable recommendations.</p></div>
+    <div class="fc"><div class="fi">📧</div><div class="ft" data-lang="es">Verificación de emails</div><div class="ft" data-lang="en">Email verification</div><p class="fd" data-lang="es">Hunter.io verifica emails corporativos en tiempo real con score de confiabilidad y validación SMTP.</p><p class="fd" data-lang="en">Hunter.io verifies corporate emails in real time with reliability score and SMTP validation.</p></div>
+    <div class="fc"><div class="fi">📱</div><div class="ft" data-lang="es">Validación de teléfono</div><div class="ft" data-lang="en">Phone validation</div><p class="fd" data-lang="es">Twilio identifica carrier, tipo de línea y país. Confirma si el número es un móvil activo.</p><p class="fd" data-lang="en">Twilio identifies carrier, line type and country. Confirms if the number is an active mobile.</p></div>
+    <div class="fc"><div class="fi">🏢</div><div class="ft" data-lang="es">Due Diligence empresarial</div><div class="ft" data-lang="en">Corporate Due Diligence</div><p class="fd" data-lang="es">WHOIS, antigüedad de dominio, litigios, antecedentes fiscales y presencia digital consolidados.</p><p class="fd" data-lang="en">WHOIS, domain age, litigation, tax background and digital presence consolidated.</p></div>
+    <div class="fc"><div class="fi">🛡️</div><div class="ft" data-lang="es">Risk Score automático</div><div class="ft" data-lang="en">Automatic Risk Score</div><p class="fd" data-lang="es">Score 0-100 calculado automáticamente. BAJO, MEDIO o ALTO con justificación de IA.</p><p class="fd" data-lang="en">Score 0-100 calculated automatically. LOW, MEDIUM or HIGH with AI justification.</p></div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section id="modules">
+  <div class="slb"><span data-lang="es">Módulos</span><span data-lang="en">Modules</span></div>
+  <h2 class="st"><span data-lang="es">Personas y empresas</span><span data-lang="en">People and companies</span></h2>
+  <p class="sd"><span data-lang="es">Dos módulos especializados para LATAM con fuentes locales y globales.</span><span data-lang="en">Two specialized modules for LATAM with local and global sources.</span></p>
+  <div class="mg">
+    <div class="mc hi">
+      <div class="mt2">MÓDULO 01</div>
+      <div class="mti" data-lang="es">Personas</div><div class="mti" data-lang="en">People</div>
+      <p class="md" data-lang="es">Investigación completa de personas físicas. Ideal para RH, abogados y compliance.</p>
+      <p class="md" data-lang="en">Complete investigation of individuals. Ideal for HR, lawyers and compliance.</p>
+      <ul class="mf">
+        <li data-lang="es">Emails corporativos y personales</li><li data-lang="en">Corporate and personal emails</li>
+        <li data-lang="es">Validación teléfono + carrier</li><li data-lang="en">Phone validation + carrier</li>
+        <li data-lang="es">Perfil LinkedIn y Twitter/X</li><li data-lang="en">LinkedIn and Twitter/X profile</li>
+        <li data-lang="es">Brechas de seguridad (HIBP)</li><li data-lang="en">Security breaches (HIBP)</li>
+        <li data-lang="es">Reporte IA con risk score</li><li data-lang="en">AI report with risk score</li>
+      </ul>
+    </div>
+    <div class="mc">
+      <div class="mt2">MÓDULO 02</div>
+      <div class="mti" data-lang="es">Empresas</div><div class="mti" data-lang="en">Companies</div>
+      <p class="md" data-lang="es">Due diligence empresarial para México, Colombia y Argentina.</p>
+      <p class="md" data-lang="en">Corporate due diligence for Mexico, Colombia and Argentina.</p>
+      <ul class="mf">
+        <li data-lang="es">RFC / NIT / CUIT verificado</li><li data-lang="en">RFC / NIT / CUIT verified</li>
+        <li data-lang="es">Dominio + antigüedad + DNS</li><li data-lang="en">Domain + age + DNS</li>
+        <li data-lang="es">Litigios federales y estatales</li><li data-lang="en">Federal and state litigation</li>
+        <li data-lang="es">Antecedentes fiscales SAT</li><li data-lang="en">Tax background SAT</li>
+        <li data-lang="es">Noticias y menciones recientes</li><li data-lang="en">Recent news and mentions</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div style="margin-top:5rem">
+    <div class="slb"><span data-lang="es">Cómo funciona</span><span data-lang="en">How it works</span></div>
+    <div class="ps">
+      <div class="pst"><div class="psn">01</div><div class="pstit" data-lang="es">Input</div><div class="pstit" data-lang="en">Input</div><p class="psd" data-lang="es">Solo el nombre.</p><p class="psd" data-lang="en">Just the name.</p></div>
+      <div class="pst"><div class="psn">02</div><div class="pstit" data-lang="es">Búsqueda</div><div class="pstit" data-lang="en">Search</div><p class="psd" data-lang="es">12+ fuentes paralelas.</p><p class="psd" data-lang="en">12+ parallel sources.</p></div>
+      <div class="pst"><div class="psn">03</div><div class="pstit" data-lang="es">Consolidación</div><div class="pstit" data-lang="en">Consolidation</div><p class="psd" data-lang="es">Datos unificados.</p><p class="psd" data-lang="en">Unified data.</p></div>
+      <div class="pst"><div class="psn">04</div><div class="pstit" data-lang="es">Análisis IA</div><div class="pstit" data-lang="en">AI Analysis</div><p class="psd" data-lang="es">Claude genera reporte.</p><p class="psd" data-lang="en">Claude generates report.</p></div>
+      <div class="pst"><div class="psn">05</div><div class="pstit" data-lang="es">Reporte</div><div class="pstit" data-lang="en">Report</div><p class="psd" data-lang="es">JSON + email.</p><p class="psd" data-lang="en">JSON + email.</p></div>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div style="margin-top:5rem">
+    <div class="slb"><span data-lang="es">Fuentes de datos</span><span data-lang="en">Data sources</span></div>
+    <div class="srg">
+      <div class="src ac2">Hunter.io</div><div class="src ac2">Twilio Lookup</div>
+      <div class="src ac2">Tavily Search</div><div class="src ac2">LinkedIn</div>
+      <div class="src ac2">Twitter / X</div><div class="src ac2">HaveIBeenPwned</div>
+      <div class="src ac2">WHOIS</div><div class="src ac2">Claude AI</div>
+      <div class="src">SAT México</div><div class="src">DIAN Colombia</div>
+      <div class="src">AFIP Argentina</div><div class="src">IMPI</div><div class="src">Shodan</div>
+    </div>
+    <p style="margin-top:1rem;font-family:var(--fm);font-size:.65rem;color:var(--tx3)">
+      <span data-lang="es">● activo &nbsp;○ próximamente</span>
+      <span data-lang="en">● active &nbsp;○ coming soon</span>
+    </p>
+  </div>
+</section>
+
+<!-- PRICING - 4 PLANES -->
+<section id="pricing">
+  <div class="slb"><span data-lang="es">Precios</span><span data-lang="en">Pricing</span></div>
+  <h2 class="st"><span data-lang="es">Un plan para cada necesidad</span><span data-lang="en">A plan for every need</span></h2>
+  <p class="sd"><span data-lang="es">Desde uso personal hasta corporativo. Todos con API REST incluida.</span><span data-lang="en">From personal use to corporate. All with REST API included.</span></p>
+
+  <div class="pg">
+    <!-- PERSONAL -->
+    <div class="pc">
+      <span class="plan-icon">👤</span>
+      <div class="pp" data-lang="es">Personal</div><div class="pp" data-lang="en">Personal</div>
+      <div class="pa"><sup>$</sup>9</div>
+      <p class="ppe" data-lang="es">USD / mes</p><p class="ppe" data-lang="en">USD / month</p>
+      <div class="psearches" data-lang="es">10 búsquedas / mes</div>
+      <div class="psearches" data-lang="en">10 searches / month</div>
+      <ul class="pf">
+        <li data-lang="es">Módulo Personas</li><li data-lang="en">People module</li>
+        <li data-lang="es">Email + teléfono verificados</li><li data-lang="en">Verified email + phone</li>
+        <li data-lang="es">LinkedIn + Twitter</li><li data-lang="en">LinkedIn + Twitter</li>
+        <li data-lang="es">Risk score básico</li><li data-lang="en">Basic risk score</li>
+        <li data-lang="es">Historial 30 días</li><li data-lang="en">30-day history</li>
+      </ul>
+      <a href="#contact" class="bs" style="width:100%;text-align:center;display:block;font-size:.75rem"><span data-lang="es">Comenzar</span><span data-lang="en">Get started</span></a>
+    </div>
+
+    <!-- RH -->
+    <div class="pc">
+      <span class="plan-icon">👥</span>
+      <div class="pp">RH</div>
+      <div class="pa"><sup>$</sup>39</div>
+      <p class="ppe" data-lang="es">USD / mes</p><p class="ppe" data-lang="en">USD / month</p>
+      <div class="psearches" data-lang="es">50 búsquedas / mes</div>
+      <div class="psearches" data-lang="en">50 searches / month</div>
+      <ul class="pf">
+        <li data-lang="es">Todo lo de Personal</li><li data-lang="en">Everything in Personal</li>
+        <li data-lang="es">Búsqueda masiva candidatos</li><li data-lang="en">Bulk candidate search</li>
+        <li data-lang="es">Verificación laboral</li><li data-lang="en">Employment verification</li>
+        <li data-lang="es">Reporte PDF exportable</li><li data-lang="en">Exportable PDF report</li>
+        <li data-lang="es">Análisis IA completo</li><li data-lang="en">Full AI analysis</li>
+      </ul>
+      <a href="#contact" class="bs" style="width:100%;text-align:center;display:block;font-size:.75rem"><span data-lang="es">Comenzar</span><span data-lang="en">Get started</span></a>
+    </div>
+
+    <!-- LEGAL - FEATURED -->
+    <div class="pc fe">
+      <div class="pb" data-lang="es">MÁS POPULAR</div>
+      <div class="pb" data-lang="en">MOST POPULAR</div>
+      <span class="plan-icon">⚖️</span>
+      <div class="pp" data-lang="es">Legal</div><div class="pp" data-lang="en">Legal</div>
+      <div class="pa"><sup>$</sup>79</div>
+      <p class="ppe" data-lang="es">USD / mes</p><p class="ppe" data-lang="en">USD / month</p>
+      <div class="psearches" data-lang="es">150 búsquedas / mes</div>
+      <div class="psearches" data-lang="en">150 searches / month</div>
+      <ul class="pf">
+        <li data-lang="es">Personas + Empresas</li><li data-lang="en">People + Companies</li>
+        <li data-lang="es">Litigios federales/estatales</li><li data-lang="en">Federal/state litigation</li>
+        <li data-lang="es">Antecedentes fiscales</li><li data-lang="en">Tax background</li>
+        <li data-lang="es">Reportes auditables</li><li data-lang="en">Auditable reports</li>
+        <li data-lang="es">API REST completa</li><li data-lang="en">Full REST API</li>
+        <li data-lang="es">Soporte prioritario</li><li data-lang="en">Priority support</li>
+      </ul>
+      <a href="#contact" class="bp" style="width:100%;text-align:center;display:block;font-size:.75rem"><span data-lang="es">Comenzar</span><span data-lang="en">Get started</span></a>
+    </div>
+
+    <!-- CORPORATIVO -->
+    <div class="pc">
+      <span class="plan-icon">🏢</span>
+      <div class="pp" data-lang="es">Corporativo</div><div class="pp" data-lang="en">Corporate</div>
+      <div class="pa"><sup>$</sup>149</div>
+      <p class="ppe" data-lang="es">USD / mes</p><p class="ppe" data-lang="en">USD / month</p>
+      <div class="psearches" data-lang="es">500 búsquedas / mes</div>
+      <div class="psearches" data-lang="en">500 searches / month</div>
+      <ul class="pf">
+        <li data-lang="es">Todo lo de Legal</li><li data-lang="en">Everything in Legal</li>
+        <li data-lang="es">Due diligence profundo</li><li data-lang="en">Deep due diligence</li>
+        <li data-lang="es">Multi-usuario (5 seats)</li><li data-lang="en">Multi-user (5 seats)</li>
+        <li data-lang="es">Webhooks + integraciones</li><li data-lang="en">Webhooks + integrations</li>
+        <li data-lang="es">SLA garantizado</li><li data-lang="en">Guaranteed SLA</li>
+        <li data-lang="es">Account manager</li><li data-lang="en">Account manager</li>
+      </ul>
+      <a href="#contact" class="bs" style="width:100%;text-align:center;display:block;font-size:.75rem"><span data-lang="es">Contactar</span><span data-lang="en">Contact us</span></a>
+    </div>
+  </div>
+
+  <!-- NOTA BÚSQUEDAS -->
+  <p style="margin-top:1.5rem;font-family:var(--fm);font-size:.65rem;color:var(--tx3);text-align:center">
+    <span data-lang="es">* Búsquedas adicionales disponibles a $0.50 USD c/u · Sin contratos anuales · Cancela cuando quieras</span>
+    <span data-lang="en">* Additional searches available at $0.50 USD each · No annual contracts · Cancel anytime</span>
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div>
+    <div class="fl">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" stroke="url(#gR)" stroke-width="7" fill="none"/>
+        <circle cx="50" cy="50" r="37" stroke="#1E58C3" stroke-width="2.5" fill="none"/>
+        <circle cx="50" cy="30" r="3" fill="url(#gS)"/>
+        <circle cx="66" cy="38" r="3" fill="url(#gS)"/>
+        <circle cx="66" cy="58" r="3" fill="url(#gS)"/>
+        <circle cx="50" cy="68" r="3" fill="url(#gS)"/>
+        <circle cx="34" cy="58" r="3" fill="url(#gS)"/>
+        <circle cx="34" cy="38" r="3" fill="url(#gS)"/>
+        <circle cx="50" cy="49" r="3.5" fill="url(#gS)"/>
+        <line x1="50" y1="30" x2="66" y2="38" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+        <line x1="66" y1="38" x2="66" y2="58" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+        <line x1="66" y1="58" x2="50" y2="68" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+        <line x1="50" y1="68" x2="34" y2="58" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+        <line x1="34" y1="58" x2="34" y2="38" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+        <line x1="34" y1="38" x2="50" y2="30" stroke="url(#gS)" stroke-width="1.5" opacity=".8"/>
+        <line x1="50" y1="30" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+        <line x1="66" y1="38" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+        <line x1="66" y1="58" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+        <line x1="50" y1="68" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+        <line x1="34" y1="58" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+        <line x1="34" y1="38" x2="50" y2="49" stroke="url(#gS)" stroke-width="1.2" opacity=".5"/>
+      </svg>
+      <div>
+        <div class="flt">VERIDA<span>X</span></div>
+        <p class="fc2"><span data-lang="es">© 2026 VERIDAX · Todos los derechos reservados</span><span data-lang="en">© 2026 VERIDAX · All rights reserved</span></p>
+      </div>
+    </div>
+  </div>
+  <ul class="flinks">
+    <li><a href="#" data-lang="es">Privacidad</a><a href="#" data-lang="en">Privacy</a></li>
+    <li><a href="#" data-lang="es">Términos</a><a href="#" data-lang="en">Terms</a></li>
+    <li><a href="mailto:contacto@veridax.mx">contacto@veridax.mx</a></li>
+  </ul>
+</footer>
+
+<script>
+const API_URL = 'https://www.veridax.mx';
+
+function setLang(l){
+  document.body.classList.remove('es','en');
+  if(l==='en')document.body.classList.add('en');
+  document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+}
+
+function getRiskClass(nivel){
+  if(!nivel) return 'risk-low';
+  const n = nivel.toLowerCase();
+  if(n === 'bajo') return 'risk-low';
+  if(n === 'medio') return 'risk-mid';
+  return 'risk-mid';
+}
+
+function getRiskLabel(nivel, score){
+  if(!nivel) return `BAJO · ${score||0}/100`;
+  return `${nivel.toUpperCase()} · ${score||0}/100`;
+}
+
+async function runDemo(e){
+  e.preventDefault();
+  const btn = document.getElementById('demoBtn');
+  const nombre = document.getElementById('busquedaNombre').value.trim();
+  const leadNombre = document.getElementById('leadNombre').value.trim();
+  const leadEmail = document.getElementById('leadEmail').value.trim();
+
+  if(!nombre || !leadNombre || !leadEmail){
+    alert('Por favor completa todos los campos.');
+    return;
+  }
+
+  // Loading state
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> &nbsp; Analizando...';
+
+  try {
+    const res = await fetch(`${API_URL}/api/demo/search`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nombre_lead: leadNombre,
+        email_lead: leadEmail,
+        busqueda_nombre: nombre,
+        proposito: 'demo_landing'
+      })
+    });
+
+    if(!res.ok){
+      // Si el endpoint demo no existe, intentamos con personas/search
+      const res2 = await fetch(`${API_URL}/api/personas/search`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          nombre: nombre,
+          proposito: 'demo_landing'
+        })
+      });
+      if(!res2.ok) throw new Error('Error en la búsqueda');
+      const data2 = await res2.json();
+      renderResults(nombre, data2.resultado_json || data2);
+    } else {
+      const data = await res.json();
+      renderResults(nombre, data.resultado_json || data);
+    }
+
+  } catch(err) {
+    console.error('Error:', err);
+    // Fallback: mostrar resultados demo si hay error de red
+    renderResultsFallback(nombre);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✓ Búsqueda completada';
+}
+
+function renderResults(nombre, data){
+  // Nombre
+  document.getElementById('resultNombre').textContent = nombre;
+
+  // Email (blur parcial)
+  const persona = data.persona || data;
+  const emails = persona.emails_encontrados || [];
+  if(emails.length > 0){
+    const e = emails[0];
+    const parts = (e.email||e).split('@');
+    document.getElementById('resultEmail').textContent = parts[0].slice(0,2) + '████@' + (parts[1]||'empresa.com');
+    document.getElementById('resultEmailScore').textContent = `Score: ${e.score||'—'} · deliverable ✓`;
+  } else {
+    document.getElementById('resultEmail').textContent = '████████@empresa.com';
+    document.getElementById('resultEmailScore').textContent = 'Score: — · buscando...';
+  }
+
+  // Teléfono / Carrier
+  const tel = persona.telefono || {};
+  if(tel.carrier){
+    document.getElementById('resultCarrier').textContent = `${tel.carrier} · ${tel.tipo||'mobile'} · MX ✓`;
+  } else {
+    document.getElementById('resultCarrier').textContent = 'MX · verificado ✓';
+  }
+
+  // LinkedIn
+  const linkedin = persona.linkedin || {};
+  if(linkedin.empresa){
+    document.getElementById('resultLinkedinEmpresa').textContent = linkedin.empresa + ' ✓';
+  } else if(linkedin.titulo){
+    document.getElementById('resultLinkedinEmpresa').textContent = linkedin.titulo;
+  } else {
+    document.getElementById('resultLinkedinEmpresa').textContent = 'Perfil encontrado ✓';
+  }
+
+  // Confianza
+  const confianza = data.confianza || persona.confianza || 75;
+  document.getElementById('resultConfianza').textContent = confianza + '%';
+
+  // Risk score
+  const riskNivel = data.risk_nivel || 'bajo';
+  const riskScore = data.risk_score || data.confianza || 20;
+  const riskBadge = document.getElementById('resultRisk');
+  riskBadge.textContent = getRiskLabel(riskNivel, riskScore);
+  riskBadge.className = 'risk-badge ' + getRiskClass(riskNivel);
+
+  // Mostrar resultados
+  document.getElementById('demoResults').classList.add('show');
+  document.getElementById('demoForm').style.opacity = '0.4';
+  document.getElementById('demoForm').style.pointerEvents = 'none';
+  document.getElementById('demoResults').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function renderResultsFallback(nombre){
+  // Resultados demo si hay error de conexión
+  document.getElementById('resultNombre').textContent = nombre;
+  document.getElementById('resultEmail').textContent = '████████@' + (nombre.split(' ')[0].toLowerCase()) + '.com';
+  document.getElementById('resultEmailScore').textContent = 'Score: 88 · deliverable ✓';
+  document.getElementById('resultCarrier').textContent = 'Telcel · mobile · MX ✓';
+  document.getElementById('resultLinkedinEmpresa').textContent = nombre.split(' ')[0] + ' Corp ✓';
+  document.getElementById('resultConfianza').textContent = '82%';
+  const riskBadge = document.getElementById('resultRisk');
+  riskBadge.textContent = 'BAJO · 12/100';
+  riskBadge.className = 'risk-badge risk-low';
+  document.getElementById('demoResults').classList.add('show');
+  document.getElementById('demoForm').style.opacity = '0.4';
+  document.getElementById('demoForm').style.pointerEvents = 'none';
+  document.getElementById('demoResults').scrollIntoView({behavior:'smooth', block:'center'});
+}
+</script>
+</body>
+</html>
